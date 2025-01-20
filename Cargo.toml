@@ -9,6 +9,10 @@ name = "qrrust"
 path = "src/main.rs"
 crate_type = ["rlib"]
 
+[[bin]]
+name = "qrrust-bloated"
+path = "src/main.rs"
+
 # Screw it, compilation fails in dev mode so just make them the same
 # Link time optimization also makes it emit llvm bytecode instead of an elf for some reason, so that had to go
 

@@ -25,6 +25,17 @@
     };
 
     RUSTFLAGS = "-Zlocation-detail=none -C link-arg=-nostartfiles -C link-arg=-nostdlib";
+
+    shrinkRustlibHook =
+      pkgs.makeSetupHook {
+        name = "shrink-rustlib-hook.sh";
+        propagatedBuildInputs = with pkgs; [nasm];
+        substitutions = {
+          linkScript = ./build/script.ld;
+          headerAsm = ./build/header.s;
+        };
+      }
+      ./build/shrink-rustlib-hook.sh;
   in {
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = with pkgs; [rustToolchain alejandra nasm];
@@ -42,7 +53,10 @@
         lockFile = ./Cargo.lock;
       };
 
+      nativeBuildInputs = [shrinkRustlibHook];
+
       inherit RUSTFLAGS;
+      cargoBuildFlags = "--lib";
     };
 
     defaultPackage.${system} = self.packages.${system}.qrrust;
