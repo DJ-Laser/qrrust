@@ -3,8 +3,9 @@
 #![feature(naked_functions)]
 
 use core::arch::naked_asm;
+use core::slice::from_raw_parts as mkslice;
 
-use io::strlen;
+use io::to_cstr_slice;
 use syscalls::exit;
 
 mod io;
@@ -17,19 +18,21 @@ pub unsafe extern "C" fn _start() {
 }
 
 #[no_mangle]
-pub unsafe fn main(stack_top: *const u8) {
-  let argc = *(stack_top as *const u64);
-  let argv = stack_top.add(8) as *const *const u8;
+pub fn main(stack_top: *const u8) {
+  let args = unsafe {
+    let argc = *(stack_top as *const u64);
+    let argv = stack_top.add(8) as *const *const u8;
 
-  use core::slice::from_raw_parts as mkslice;
-  let args = mkslice(argv, argc as usize);
+    let args = mkslice(argv, argc as usize);
 
-  for &arg in args {
-    let arg = mkslice(arg, strlen(arg));
+    args.into_iter().map(|arg| to_cstr_slice(*arg))
+  };
+
+  for arg in args.clone() {
     writeln!(1, arg);
   }
 
-  write!(1, argc as usize);
+  write!(1, args.len());
   exit(0);
 }
 

@@ -1,15 +1,19 @@
 use core::arch::asm;
 
-pub unsafe fn exit(code: i32) -> ! {
-  let syscall_number: u64 = 60;
-  asm!(
-      "syscall",
-      in("rax") syscall_number,
-      in("rdi") code,
-      options(noreturn)
-  )
+/// Should be safe?
+pub fn exit(code: i32) -> ! {
+  unsafe {
+    let syscall_number: u64 = 60;
+    asm!(
+        "syscall",
+        in("rax") syscall_number,
+        in("rdi") code,
+        options(noreturn)
+    )
+  }
 }
 
+/// prefer io::write! unless you need to do something EXTREMELY silly
 pub unsafe fn write(fd: u32, buf: *const u8, count: usize) {
   let syscall_number: u64 = 1;
   asm!(
