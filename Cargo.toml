@@ -4,18 +4,24 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
+[lib]
+name = "qrrust"
+path = "src/main.rs"
+crate_type = ["rlib"]
+
 # Screw it, compilation fails in dev mode so just make them the same
+# Link time optimization also makes it emit llvm bytecode instead of an elf for some reason, so that had to go
 
 [profile.dev]
 opt-level = "z"     # Optimize for size.
-lto = true          # Enable Link Time Optimization
-codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = "abort"     # Abort on panic
-strip = true        # Automatically strip symbols from the binary.
+
+# These break debug builds for some reason
+debug-assertions = false
+overflow-checks = false
 
 [profile.release]
 opt-level = "z"     # Optimize for size.
-lto = true          # Enable Link Time Optimization
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = "abort"     # Abort on panic
 strip = true        # Automatically strip symbols from the binary.

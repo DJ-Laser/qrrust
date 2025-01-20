@@ -27,7 +27,7 @@
     RUSTFLAGS = "-Zlocation-detail=none -C link-arg=-nostartfiles -C link-arg=-nostdlib";
   in {
     devShells.${system}.default = pkgs.mkShell {
-      buildInputs = with pkgs; [rustToolchain alejandra upx];
+      buildInputs = with pkgs; [rustToolchain alejandra nasm];
 
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/src";
       inherit RUSTFLAGS;
@@ -42,7 +42,6 @@
         lockFile = ./Cargo.lock;
       };
 
-      cargoBuildType = "release";
       inherit RUSTFLAGS;
     };
 

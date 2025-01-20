@@ -12,7 +12,7 @@ mod syscalls;
 
 #[no_mangle]
 #[naked]
-pub unsafe extern "C" fn _start(stack_top: *const u8) {
+pub unsafe extern "C" fn _start() {
   naked_asm!("mov rdi, rsp", "call main")
 }
 
@@ -29,6 +29,7 @@ pub unsafe fn main(stack_top: *const u8) {
     writeln!(1, arg);
   }
 
+  write!(1, argc as usize);
   exit(0);
 }
 
