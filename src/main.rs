@@ -12,7 +12,6 @@ mod syscalls;
 
 #[no_mangle]
 #[naked]
-// new: now extern "C"
 pub unsafe extern "C" fn _start(stack_top: *const u8) {
   naked_asm!("mov rdi, rsp", "call main")
 }
@@ -30,9 +29,10 @@ pub unsafe fn main(stack_top: *const u8) {
     writeln!(1, arg);
   }
 
-  exit(argc as _);
+  exit(0);
 }
 
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
   loop {}
