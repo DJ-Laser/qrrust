@@ -38,7 +38,7 @@
       ./build/shrink-rustlib-hook.sh;
   in {
     devShells.${system}.default = pkgs.mkShell {
-      buildInputs = with pkgs; [rustToolchain alejandra nasm];
+      buildInputs = with pkgs; [rustToolchain alejandra nasm gdb];
 
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/src";
       inherit RUSTFLAGS;
@@ -53,10 +53,14 @@
         lockFile = ./Cargo.lock;
       };
 
+      # Disable nix patches and things, they only add bloat without any linked libraries
+      phases = ["unpackPhase" "buildPhase" "checkPhase" "installPhase"];
       nativeBuildInputs = [shrinkRustlibHook];
 
       inherit RUSTFLAGS;
       cargoBuildFlags = "--lib";
+
+      doCheck = false;
     };
 
     defaultPackage.${system} = self.packages.${system}.qrrust;

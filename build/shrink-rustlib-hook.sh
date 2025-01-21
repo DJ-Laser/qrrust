@@ -16,10 +16,10 @@ shrinkRustlibHook() {
     local OBJFILE=$(ar t $libraryName | grep $binaryName)
     ar x $libraryName $OBJFILE
 
-    ld --gc-sections -e _start -T @linkScript@ -o payload $OBJFILE
-    objcopy -j combined -O binary payload payload.bin
+    ld --gc-sections -e _start -T @linkScript@ -o payload.out $OBJFILE
+    objcopy -j combined -j .got -j .got.plt -O binary payload.out payload.bin
 
-    local ENTRY=$(nm -f posix payload | grep '^_start ' | awk '{print $3}')
+    local ENTRY=$(nm -f posix payload.out | grep '^_start ' | awk '{print $3}')
     nasm -f bin -o $binaryName -D entry=0x$ENTRY @headerAsm@
 
     chmod +x $binaryName

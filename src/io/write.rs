@@ -11,6 +11,12 @@ impl<'a> From<usize> for Writable<'a> {
   }
 }
 
+impl<'a> From<&'a str> for Writable<'a> {
+  fn from(s: &'a str) -> Self {
+    Writable::Bytes(s.as_bytes())
+  }
+}
+
 impl<'a> From<&'a [u8]> for Writable<'a> {
   fn from(v: &'a [u8]) -> Self {
     Writable::Bytes(v)

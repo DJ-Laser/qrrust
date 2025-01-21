@@ -19,7 +19,7 @@ pub unsafe extern "C" fn _start() {
 
 #[no_mangle]
 pub fn main(stack_top: *const u8) {
-  let args = unsafe {
+  let mut args = unsafe {
     let argc = *(stack_top as *const u64);
     let argv = stack_top.add(8) as *const *const u8;
 
@@ -28,11 +28,24 @@ pub fn main(stack_top: *const u8) {
     args.into_iter().map(|arg| to_cstr_slice(*arg))
   };
 
-  for arg in args.clone() {
-    writeln!(1, arg);
+  let _argv0 = args.next();
+
+  match args.next() {
+    Some(flag @ b"-l") | Some(flag @ b"--level") => {
+      let Some(level) = args.next() else {
+        write!(1, "Expected a level number after ", flag);
+        exit(2);
+      };
+
+      write!(1, "Selected level: ", level)
+    }
+    Some(_) => {
+      write!(1, "Invalid option, only -l or --level is permitted");
+      exit(2);
+    }
+    None => (),
   }
 
-  write!(1, args.len());
   exit(0);
 }
 
