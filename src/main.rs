@@ -11,13 +11,13 @@ use syscalls::exit;
 mod io;
 mod syscalls;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[naked]
 pub unsafe extern "C" fn _start() {
-  naked_asm!("mov rdi, rsp", "call main")
+  unsafe { naked_asm!("mov rdi, rsp", "call main") }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn main(stack_top: *const u8) {
   let mut args = unsafe {
     let argc = *(stack_top as *const u64);
@@ -33,14 +33,14 @@ pub fn main(stack_top: *const u8) {
   match args.next() {
     Some(flag @ b"-l") | Some(flag @ b"--level") => {
       let Some(level) = args.next() else {
-        write!(1, "Expected a level number after ", flag);
+        eprintln!("Expected a level number after ", flag);
         exit(2);
       };
 
-      write!(1, "Selected level: ", level)
+      println!("Selected level: ", level);
     }
     Some(_) => {
-      write!(1, "Invalid option, only -l or --level is permitted");
+      eprintln!("Invalid option, only -l or --level is permitted");
       exit(2);
     }
     None => (),

@@ -15,14 +15,16 @@ pub fn exit(code: i32) -> ! {
 
 /// prefer io::write! unless you need to do something EXTREMELY silly
 pub unsafe fn write(fd: u32, buf: *const u8, count: usize) {
-  let syscall_number: u64 = 1;
-  asm!(
-      "syscall",
-        inout("rax") syscall_number => _,
-        in("rdi") fd,
-        in("rsi") buf,
-        in("rdx") count,
-        lateout("rcx") _, lateout("r11") _,
-        options(nostack)
-  );
+  unsafe {
+    let syscall_number: u64 = 1;
+    asm!(
+        "syscall",
+          inout("rax") syscall_number => _,
+          in("rdi") fd,
+          in("rsi") buf,
+          in("rdx") count,
+          lateout("rcx") _, lateout("r11") _,
+          options(nostack)
+    );
+  }
 }

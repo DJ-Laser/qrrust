@@ -65,6 +65,6 @@ macro_rules! write {
 #[macro_export]
 macro_rules! writeln {
     ($fd:expr, $($arg:expr),+) => {
-      write!($fd, $($arg),+,b"\n");
+      write!($fd, $($arg),+,b"\n")
     };
 }

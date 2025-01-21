@@ -24,8 +24,6 @@
       rustc = rustToolchain;
     };
 
-    RUSTFLAGS = "-Zlocation-detail=none -C link-arg=-nostartfiles -C link-arg=-nostdlib";
-
     shrinkRustlibHook =
       pkgs.makeSetupHook {
         name = "shrink-rustlib-hook.sh";
@@ -41,7 +39,6 @@
       buildInputs = with pkgs; [rustToolchain alejandra nasm gdb];
 
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/src";
-      inherit RUSTFLAGS;
     };
 
     packages.${system}.qrrust = rustPlatform.buildRustPackage rec {
@@ -57,9 +54,7 @@
       phases = ["unpackPhase" "buildPhase" "checkPhase" "installPhase"];
       nativeBuildInputs = [shrinkRustlibHook];
 
-      inherit RUSTFLAGS;
       cargoBuildFlags = "--lib";
-
       doCheck = false;
     };
 

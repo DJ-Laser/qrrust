@@ -1,17 +1,31 @@
+[workspace]
+members = ["macros"]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["DJ_Laser"]
+edition = "2024"
+license = "MIT"
+
 [package]
 name = "qrrust"
-version = "0.1.0"
-edition = "2021"
-license = "MIT"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
 
 [lib]
 name = "qrrust"
 path = "src/main.rs"
-crate_type = ["rlib"]
+crate-type = ["rlib"]
 
 [[bin]]
 name = "qrrust-bloated"
 path = "src/main.rs"
+
+[dependencies]
+macros = { path = "./macros" }
 
 # Screw it, compilation fails in dev mode so just make them the same
 # Link time optimization also makes it emit llvm bytecode instead of an elf for some reason, so that had to go

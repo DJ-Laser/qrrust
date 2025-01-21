@@ -1,0 +1,3 @@
+[build]
+target = ["x86_64-unknown-linux-gnu"]
+rustflags = "-Zlocation-detail=none -C link-arg=-nostartfiles -C link-arg=-nostdlib"
