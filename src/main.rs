@@ -9,6 +9,7 @@ use io::to_cstr_slice;
 use syscalls::exit;
 
 mod io;
+mod level;
 mod syscalls;
 
 #[unsafe(no_mangle)]
