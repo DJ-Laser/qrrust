@@ -1,32 +1,35 @@
 use macros::level;
 
+use crate::{eprintln, println};
+
 pub type Position = (u8, u8);
 
 #[repr(u8)]
 pub enum LevelObject {
+  Space,
   Wall,
   Goal,
 }
 
-pub struct Level<const W: usize, const H: usize, const G: usize> {
+pub struct Level<const W: usize, const H: usize, const B: usize> {
   layout: [[LevelObject; W]; H],
-  boxes: [Position; G],
+  boxes: [Position; B],
   player: Position,
 }
 
-impl<const W: usize, const H: usize, const G: usize> Level<W, H, G> {
+impl<const W: usize, const H: usize, const B: usize> Level<W, H, B> {
   /// Create a level from bare positions, can create invalid levels, so prefer the level macro
-  pub fn new(layout: [[LevelObject; W]; H], boxes: [Position; G], player: Position) -> Self {
+  pub fn __new_from_raw(
+    layout: [[LevelObject; W]; H],
+    boxes: [Position; B],
+    player: Position,
+  ) -> Self {
     Self {
       layout,
       boxes,
       player,
     }
   }
-}
-
-fn test() {
-  level!(4);
 }
 
 #[repr(u64)]
