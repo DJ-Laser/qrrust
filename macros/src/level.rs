@@ -45,12 +45,12 @@ impl<'a> TryFrom<&'a char> for LevelInput {
     match value {
       '#' => Ok(Self::Wall),
       ' ' => Ok(Self::Space),
-      '*' => Ok(Self::Goal),
+      'g' => Ok(Self::Goal),
       'b' => Ok(Self::Box),
       'B' => Ok(Self::BoxOnGoal),
       'p' => Ok(Self::Player),
       'P' => Ok(Self::PlayerOnGoal),
-      c => Err(format!("Expected any of `# *bBpP`, got `{}`", c)),
+      c => Err(format!("Expected any of `# bBpPg`, got `{}`", c)),
     }
   }
 }
