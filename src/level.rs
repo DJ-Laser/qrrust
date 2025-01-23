@@ -1,3 +1,5 @@
+use macros::level;
+
 pub type Position = (u8, u8);
 
 #[repr(u8)]
@@ -15,7 +17,7 @@ pub struct Level<const W: usize, const H: usize, const B: usize> {
 
 impl<const W: usize, const H: usize, const B: usize> Level<W, H, B> {
   /// Create a level from bare positions, can create invalid levels, so prefer the level macro
-  pub fn __new_from_raw(
+  pub const fn __new_from_raw(
     layout: [[LevelObject; W]; H],
     boxes: [Position; B],
     player: Position,
@@ -40,3 +42,5 @@ pub enum Tile {
 pub struct LevelView<const W: usize, const H: usize> {
   layout: [[Tile; W]; H],
 }
+
+static LEVEL_0: Level<5, 1, 1> = level!(["p b g"]);
