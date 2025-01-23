@@ -53,7 +53,6 @@ pub fn write_args(fd: u32, args: &[Writable]) {
   }
 }
 
-#[macro_export]
 macro_rules! write {
     ($fd:expr, $($arg:expr),+) => {
       $crate::io::write_args($fd, &[
@@ -62,9 +61,10 @@ macro_rules! write {
     };
 }
 
-#[macro_export]
 macro_rules! writeln {
     ($fd:expr, $($arg:expr),+) => {
-      write!($fd, $($arg),+,b"\n")
+      $crate::io::write!($fd, $($arg),+,b"\n")
     };
 }
+
+pub(crate) use {write, writeln};

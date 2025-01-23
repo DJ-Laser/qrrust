@@ -1,7 +1,3 @@
-use macros::level;
-
-use crate::{eprintln, println};
-
 pub type Position = (u8, u8);
 
 #[repr(u8)]

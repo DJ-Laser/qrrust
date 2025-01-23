@@ -5,7 +5,7 @@
 use core::arch::naked_asm;
 use core::slice::from_raw_parts as mkslice;
 
-use io::to_cstr_slice;
+use io::{eprintln, println, to_cstr_slice};
 use syscalls::exit;
 
 mod io;
