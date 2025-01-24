@@ -6,6 +6,7 @@ use core::arch::naked_asm;
 use core::slice::from_raw_parts as mkslice;
 
 use io::{eprintln, println, to_cstr_slice};
+use level::LevelView;
 use syscalls::exit;
 
 mod io;
@@ -46,6 +47,9 @@ pub fn main(stack_top: *const u8) {
     }
     None => (),
   }
+
+  let view = LevelView::from(&level::LEVEL_0);
+  view.print();
 
   exit(0);
 }

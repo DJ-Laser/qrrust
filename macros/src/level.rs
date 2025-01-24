@@ -2,7 +2,7 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
-use syn::{Expr, ExprArray, ExprLit, Lit};
+use syn::{Expr, ExprArray, ExprLit, Ident, Lit, Token};
 
 #[derive(Debug)]
 enum LevelInput {
@@ -58,6 +58,7 @@ impl<'a> TryFrom<&'a char> for LevelInput {
 #[derive(Debug)]
 pub struct Input {
   layout: Vec<(Vec<LevelInput>, Span)>,
+  name: Ident,
   width: usize,
   height: usize,
   span: Span,
@@ -65,6 +66,10 @@ pub struct Input {
 
 impl Parse for Input {
   fn parse(input: ParseStream) -> syn::Result<Self> {
+    let name: Ident = input.parse()?;
+
+    let _: Token![=] = input.parse()?;
+
     let exprs: ExprArray = input.parse()?;
     let span = exprs.span();
 
@@ -117,6 +122,7 @@ impl Parse for Input {
 
     Ok(Self {
       layout: layout?,
+      name,
       width: expected_width.unwrap(),
       height,
       span,
@@ -124,28 +130,7 @@ impl Parse for Input {
   }
 }
 
-fn validate_num_size(label: &'static str, number: usize, span: Span) -> syn::Result<u8> {
-  if let Ok(number) = number.try_into() {
-    return Ok(number);
-  };
-
-  Err(syn::Error::new(
-    span,
-    format!("Level {label} shuld fit within a u8 (max 255), but got {number}"),
-  ))
-}
-
 pub fn macro_impl(input: Input) -> TokenStream {
-  match validate_num_size("width", input.width, input.span) {
-    Err(err) => return err.to_compile_error(),
-    Ok(_) => (),
-  }
-
-  match validate_num_size("height", input.height, input.span) {
-    Err(err) => return err.to_compile_error(),
-    Ok(_) => (),
-  }
-
   let mut layout: Vec<Vec<TokenStream>> = Vec::new();
   let mut player: Option<TokenStream> = None;
   let mut boxes: Vec<TokenStream> = Vec::new();
@@ -167,7 +152,7 @@ pub fn macro_impl(input: Input) -> TokenStream {
 
       row.push(layout_variant.parse().unwrap());
 
-      let (x, y) = (x as u8, y as u8);
+      let (x, y) = (x, y);
       let position = quote! {(#x, #y)};
       if item.is_box() {
         boxes.push(position);
@@ -205,9 +190,9 @@ pub fn macro_impl(input: Input) -> TokenStream {
     .to_compile_error();
   }
 
-  let layout = layout;
-  let boxes = boxes;
-  let player = player;
+  let width = input.width;
+  let height = input.height;
+  let name = input.name;
 
-  return quote! { crate::level::Level::__new_from_raw([#([#(#layout),*]),*], [#(#boxes),*], #player) };
+  return quote! { pub static #name: crate::level::Level<#width, #height, #box_count> = crate::level::Level::__new_from_raw([#([#(#layout),*]),*], [#(#boxes),*], #player); };
 }
