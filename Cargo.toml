@@ -9,7 +9,7 @@ license = "MIT"
 
 [package]
 name = "qrrust"
-version.workspace = true
+version = "0.1.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -27,16 +27,9 @@ path = "src/main.rs"
 [dependencies]
 macros = { path = "./macros" }
 
-# Screw it, compilation fails in dev mode so just make them the same
-# Link time optimization also makes it emit llvm bytecode instead of an elf for some reason, so that had to go
-
 [profile.dev]
 opt-level = "z"     # Optimize for size.
 panic = "abort"     # Abort on panic
-
-# These break debug builds for some reason
-debug-assertions = false
-overflow-checks = false
 
 [profile.release]
 opt-level = "z"     # Optimize for size.
