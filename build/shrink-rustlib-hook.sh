@@ -3,15 +3,16 @@
 shrinkRustlibHook() {
     echo "Executing shrinkRustlibHook"
 
-    shrinkDir="${releaseDir}-shrink";
     local prevDir=$(pwd)
-
-    mkdir -p $shrinkDir
-    cp -r ${releaseDir}/* $shrinkDir/
-    cd $shrinkDir
+    mkdir -p $out/bin
 
     local binaryName=$pname
     local libraryName=lib${binaryName}.rlib
+
+    local tmpDir=$(mktemp -d)
+
+    cp $out/target/x86_64-unknown-linux-gnu/release/$libraryName $tmpDir
+    cd $tmpDir
 
     local OBJFILE=$(ar t $libraryName | grep $binaryName)
     ar x $libraryName $OBJFILE
@@ -24,16 +25,16 @@ shrinkRustlibHook() {
 
     chmod +x $binaryName
 
+    cd $out
+    cp $tmpDir/$binaryName bin/
+    rm -r $tmpDir
+
     cd $prevDir
-    cp $shrinkDir/$binaryName $releaseDir/$binaryName
-
-    rm -r $shrinkDir
-
-    bins=${bins}\ $releaseDir/$binaryName
+    rm -r $out/target
 
     echo "Finished shrinkRustlibHook"
 }
 
-if [ -z "${preInstall-}" ]; then
-    preInstallHooks+=(shrinkRustlibHook)
+if [ -z "${postInstall-}" ]; then
+    postInstallHooks+=(shrinkRustlibHook)
 fi
