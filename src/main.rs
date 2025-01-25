@@ -30,7 +30,7 @@ pub fn main(stack_top: *const u8) {
     args.into_iter().map(|arg| to_cstr_slice(*arg))
   };
 
-  /*let _argv0 = args.next();
+  let _argv0 = args.next();
 
   match args.next() {
     Some(flag @ b"-l") | Some(flag @ b"--level") => {
@@ -48,8 +48,8 @@ pub fn main(stack_top: *const u8) {
     None => (),
   }
 
-  let view = LevelView::from(&level::LEVEL_0);
-  view.print();*/
+  //let view = LevelView::from(&level::LEVEL_0);
+  //view.print();
 
   exit(0);
 }
