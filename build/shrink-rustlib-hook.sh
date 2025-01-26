@@ -22,11 +22,19 @@ shrinkRustlibHook() {
 
     chmod +x $binaryName
 
-    cd $out
-    cp $tmpDir/$binaryName bin/
-    rm -r $tmpDir
+    local zippedBinaryName=${binaryName}-zipped
+    cp @unzipScript@ $zippedBinaryName
+    ls -la $zippedBinaryName
+    chmod 755 $zippedBinaryName
+    gzip -9c $binaryName >> $zippedBinaryName
+    chmod +x $zippedBinaryName
+
+    cp $binaryName $out/bin/
+    cp $zippedBinaryName $out/bin/
 
     cd $prevDir
+    rm -r $tmpDir`1`
+
     rm -r $out/target
 
     echo "Finished shrinkRustlibHook"

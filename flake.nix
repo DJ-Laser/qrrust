@@ -40,6 +40,7 @@
           substitutions = {
             linkScript = ./build/script.ld;
             headerAsm = ./build/header.s;
+            unzipScript = ./build/unzip-template.sh;
           };
         }
         ./build/shrink-rustlib-hook.sh;
