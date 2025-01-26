@@ -33,25 +33,54 @@ impl<const W: usize, const H: usize, const B: usize> Level<W, H, B> {
   }
 }
 
+enum Color {
+  Default,
+  Goal,
+}
+
+impl Color {
+  fn bg(&self) -> &[u8] {
+    match self {
+      Self::Default => "\x1b[49m".as_bytes(),
+      Self::Goal => "\x1b[42m".as_bytes(),
+    }
+  }
+}
+
 #[derive(Clone, Copy)]
-pub enum Tile {
+enum Tile {
   Space,
   Box,
   Goal,
   BoxOnGoal,
   Player,
+  PlayerOnGoal,
   Wall,
 }
 
 impl Tile {
-  fn to_bytes(&self) -> &[u8] {
+  fn line_one(&self) -> &[u8] {
     match self {
-      Self::Space => b" ",
-      Self::Box => b"\xE2\x98\x90",       // ☐
-      Self::Goal => b"x",                 // x
-      Self::BoxOnGoal => b"\xE2\x98\x92", // ☒
-      Self::Player => b"\xE2\x8F\xA3",    // ⏣ Potential symbols: ⏇  ⍙ ♟
-      Self::Wall => b"\xE2\x96\x88",      // █
+      Self::Wall => "██".as_bytes(),
+      Self::Space | Self::Goal => "  ".as_bytes(),
+      Self::Box | Self::BoxOnGoal => "▗▖".as_bytes(),
+      Self::Player | Self::PlayerOnGoal => "..".as_bytes(),
+    }
+  }
+
+  fn line_two(&self) -> &[u8] {
+    match self {
+      Self::Wall => "██".as_bytes(),
+      Self::Space | Self::Goal => "  ".as_bytes(),
+      Self::Box | Self::BoxOnGoal => "▝▘".as_bytes(),
+      Self::Player | Self::PlayerOnGoal => "╰╯".as_bytes(),
+    }
+  }
+
+  fn color(&self) -> Color {
+    match self {
+      Self::Goal | Self::BoxOnGoal | Self::PlayerOnGoal => Color::Goal,
+      _ => Color::Default,
     }
   }
 }
@@ -95,7 +124,13 @@ impl<const W: usize, const H: usize> LevelView<W, H> {
   pub fn write(&self, fd: u32) {
     for row in self.layout {
       for tile in row {
-        write!(fd, tile.to_bytes());
+        write!(fd, tile.color().bg(), tile.line_one());
+      }
+
+      writeln!(fd, &[]);
+
+      for tile in row {
+        write!(fd, tile.color().bg(), tile.line_two());
       }
 
       writeln!(fd, &[]);
@@ -107,4 +142,4 @@ impl<const W: usize, const H: usize> LevelView<W, H> {
   }
 }
 
-level!(LEVEL_0 = ["#######", "#p b g#", "#######"]);
+level!(LEVEL_0 = ["#####", "#pbg#", "#####"]);
