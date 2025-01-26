@@ -5,10 +5,11 @@
 use core::arch::naked_asm;
 use core::slice::from_raw_parts as mkslice;
 
+use graphics::LevelView;
 use io::{eprintln, println, to_cstr_slice};
-use level::LevelView;
 use syscalls::exit;
 
+mod graphics;
 mod io;
 mod level;
 mod syscalls;
