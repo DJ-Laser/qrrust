@@ -48,8 +48,8 @@ pub fn main(stack_top: *const u8) {
     None => (),
   }
 
-  //let view = LevelView::from(&level::LEVEL_0);
-  //view.print();
+  let view = LevelView::from(&level::LEVEL_0);
+  view.print();
 
   exit(0);
 }

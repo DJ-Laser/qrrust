@@ -14,11 +14,10 @@ authors.workspace = true
 edition.workspace = true
 license.workspace = true
 
-
 [lib]
 name = "qrrust"
 path = "src/main.rs"
-crate-type = ["rlib"]
+crate-type = ["staticlib"]
 
 [[bin]]
 name = "qrrust-bloated"
