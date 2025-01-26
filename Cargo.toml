@@ -25,6 +25,7 @@ path = "src/main.rs"
 
 [dependencies]
 macros = { path = "./macros" }
+rustix = { version = "0.38.44", default-features = false, features = ["termios"] }
 
 [profile.dev]
 opt-level = "z"     # Optimize for size.

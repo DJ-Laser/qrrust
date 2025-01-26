@@ -6,7 +6,11 @@ use core::arch::naked_asm;
 use core::slice::from_raw_parts as mkslice;
 
 use graphics::LevelView;
-use io::{eprintln, println, to_cstr_slice};
+use io::{
+  STDIN_FILENO, eprintln, print, println, read_into_buf,
+  terminal::{enable_raw_mode, get_termios, set_termios},
+  to_cstr_slice,
+};
 use syscalls::exit;
 
 mod graphics;
@@ -50,7 +54,25 @@ pub fn main(stack_top: *const u8) {
   }
 
   let view = LevelView::from(&level::LEVEL_0);
-  view.print();
+
+  let prev_termios = get_termios();
+  enable_raw_mode(prev_termios.clone());
+
+  let mut input_buf: [u8; 1] = [0];
+  loop {
+    // Clear the terminal
+    print!(b"\x1bc");
+    view.print();
+
+    read_into_buf(STDIN_FILENO, &mut input_buf);
+
+    match input_buf[0] {
+      b'\x03' => break,
+      _ => (),
+    }
+  }
+
+  set_termios(&prev_termios);
 
   exit(0);
 }

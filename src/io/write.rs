@@ -63,7 +63,7 @@ macro_rules! write {
 
 macro_rules! writeln {
     ($fd:expr, $($arg:expr),+) => {
-      $crate::io::write!($fd, $($arg),+,b"\n")
+      $crate::io::write!($fd, $($arg),+,b"\r\n")
     };
 }
 

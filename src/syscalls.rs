@@ -28,3 +28,18 @@ pub unsafe fn write(fd: u32, buf: *const u8, count: usize) {
     );
   }
 }
+
+pub unsafe fn read(fd: u32, buf: *mut u8, count: usize) {
+  unsafe {
+    let syscall_number: u64 = 0;
+    asm!(
+        "syscall",
+          inout("rax") syscall_number => _,
+          in("rdi") fd,
+          in("rsi") buf,
+          in("rdx") count,
+          lateout("rcx") _, lateout("r11") _,
+          options(nostack)
+    );
+  }
+}
