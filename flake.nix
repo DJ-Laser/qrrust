@@ -27,7 +27,7 @@
     };
   in {
     devShells.${system}.default = pkgs.mkShell {
-      buildInputs = with pkgs; [rustToolchain alejandra nasm gdb];
+      buildInputs = with pkgs; [rustToolchain alejandra nasm gdb qrencode];
 
       RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/src";
     };
@@ -36,7 +36,7 @@
       shrinkRustlibHook =
         pkgs.makeSetupHook {
           name = "shrink-rustlib-hook.sh";
-          propagatedBuildInputs = with pkgs; [nasm];
+          propagatedBuildInputs = with pkgs; [nasm qrencode];
           substitutions = {
             linkScript = ./build/script.ld;
             headerAsm = ./build/header.s;

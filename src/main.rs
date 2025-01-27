@@ -19,15 +19,9 @@ pub unsafe extern "C" fn _start() {
   unsafe { naked_asm!("mov rdi, rsp", "call main") }
 }
 
-const LEVELS: &'static [fn() -> (fn(), for<'a> fn(&'a Movement) -> bool)] = const {
-  use level::*;
-  &[level_1, level_2, level_3, level_4]
-};
-
 #[unsafe(no_mangle)]
 pub fn main() {
-  let mut level = 0;
-  let (mut print_level, mut move_player) = LEVELS[level]();
+  let (mut print_level, mut move_player) = level::level_4();
 
   let mut input_buf: [u8; 1] = [0];
   loop {
@@ -44,7 +38,7 @@ pub fn main() {
       b's' => Movement::Down,
       b'd' => Movement::Right,
       b'r' => {
-        (print_level, move_player) = LEVELS[level]();
+        (print_level, move_player) = level::level_4();
         continue;
       }
       _ => continue,
@@ -52,17 +46,11 @@ pub fn main() {
 
     // Returns true on clear
     if move_player(&movement) {
-      if level == LEVELS.len() - 1 {
-        print!(b"\x1bc");
-        print_level();
-        println!("Congrats! You beat the last level!");
+      print!(b"\x1bc");
+      print_level();
+      println!("Congrats! You beat the last level!");
 
-        break;
-      }
-
-      level += 1;
-
-      (print_level, move_player) = LEVELS[level]();
+      break;
     }
   }
 

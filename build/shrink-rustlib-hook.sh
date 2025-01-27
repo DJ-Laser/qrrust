@@ -5,6 +5,7 @@ shrinkRustlibHook() {
 
     local prevDir=$(pwd)
     mkdir -p $out/bin
+    mkdir -p $out/qr
 
     local binaryName=$pname
     local libraryName=lib${binaryName}.a
@@ -29,8 +30,15 @@ shrinkRustlibHook() {
     gzip -9c $binaryName >> $zippedBinaryName
     chmod +x $zippedBinaryName
 
+    local qrDataName=${binaryName}-qrdata
+    local qrCodeName=${binaryName}.png
+    echo "data:application/octet-stream;base64," > $qrDataName
+    base64 $zippedBinaryName >> $qrDataName
+    qrencode -r $qrDataName -o $qrCodeName
+
     cp $binaryName $out/bin/
     cp $zippedBinaryName $out/bin/
+    cp $qrCodeName $out/qr
 
     cd $prevDir
     rm -r $tmpDir`1`
