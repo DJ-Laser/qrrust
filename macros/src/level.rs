@@ -193,6 +193,45 @@ pub fn macro_impl(input: Input) -> TokenStream {
   let width = input.width;
   let height = input.height;
   let name = input.name;
+  let view_name = Ident::new(&(name.to_string() + "_VIEW"), name.span());
+  let static_name = Ident::new(&(name.to_string() + "_STATIC"), name.span());
+  let exec_name = Ident::new(&(name.to_string() + "_EXEC"), name.span());
+  let print_name = Ident::new(&(name.to_string() + "_PRINT"), name.span());
 
-  return quote! { pub static #name: crate::level::Level<#width, #height, #box_count> = crate::level::Level::__new_from_raw([#([#(#layout),*]),*], [#(#boxes),*], #player); };
+  return quote! {
+    #[allow(non_upper_case_globals)]
+    static mut #static_name: ::core::mem::MaybeUninit<crate::level::Level<#width, #height, #box_count>> = ::core::mem::MaybeUninit::uninit();
+    #[allow(non_upper_case_globals)]
+    static mut #view_name: ::core::mem::MaybeUninit<crate::graphics::LevelView<#width, #height>> = ::core::mem::MaybeUninit::uninit();
+
+    pub fn #name() -> (fn() -> (), fn(&crate::level::Movement) -> bool) {
+      unsafe {
+        let level = crate::level::Level::__new_from_raw([#([#(#layout),*]),*], [#(#boxes),*], #player);
+        #view_name = ::core::mem::MaybeUninit::new(crate::graphics::LevelView::from(&level));
+        #static_name = ::core::mem::MaybeUninit::new(level);
+      }
+
+      (#print_name, #exec_name)
+    }
+
+    #[allow(static_mut_refs)]
+    #[allow(non_snake_case)]
+    fn #print_name() {
+      unsafe {
+        #view_name.assume_init_ref().print();
+      }
+    }
+
+    #[allow(static_mut_refs)]
+    #[allow(non_snake_case)]
+    fn #exec_name(movement: &crate::level::Movement) -> bool {
+      unsafe {
+        let level = #static_name.assume_init_mut();
+        level.move_player(movement);
+
+        #view_name.assume_init_mut().update(&level);
+        level.is_solved()
+      }
+    }
+  };
 }

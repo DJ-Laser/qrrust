@@ -117,4 +117,6 @@ impl<const W: usize, const H: usize, const B: usize> Level<W, H, B> {
   }
 }
 
-level!(LEVEL_0 = ["P   g", "  b b", "#    "]);
+level!(level_1 = ["p b g"]);
+
+level!(level_2 = ["p bg", "gb  "]);
