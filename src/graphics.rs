@@ -66,39 +66,6 @@ pub struct LevelView<const W: usize, const H: usize> {
   layout: [[Tile; W]; H],
 }
 
-impl<'a, const W: usize, const H: usize, const B: usize> From<&'a Level<W, H, B>>
-  for LevelView<W, H>
-{
-  fn from(level: &'a Level<W, H, B>) -> Self {
-    let mut layout: [[Tile; W]; H] = [[Tile::Space; W]; H];
-
-    for (y, row) in level.layout().into_iter().enumerate() {
-      for (x, tile) in row.into_iter().enumerate() {
-        layout[y][x] = match tile {
-          LevelObject::Space => Tile::Space,
-          LevelObject::Goal => Tile::Goal,
-          LevelObject::Wall => Tile::Wall,
-        };
-      }
-    }
-
-    for (x, y) in level.boxes() {
-      layout[*y][*x] = match layout[*y][*x] {
-        Tile::Goal => Tile::BoxOnGoal,
-        _ => Tile::Box,
-      }
-    }
-
-    let (x, y) = level.player();
-    layout[*y][*x] = match layout[*y][*x] {
-      Tile::Goal => Tile::PlayerOnGoal,
-      _ => Tile::Player,
-    };
-
-    Self { layout }
-  }
-}
-
 impl<const W: usize, const H: usize> LevelView<W, H> {
   fn write_vertical_bounds(fd: u32) {
     for _ in 0..(W + 2) {
@@ -131,5 +98,41 @@ impl<const W: usize, const H: usize> LevelView<W, H> {
 
   pub fn print(&self) {
     self.write(io::STDOUT_FILENO);
+  }
+
+  pub fn update<const B: usize>(&mut self, level: &Level<W, H, B>) {
+    for (y, row) in level.layout().into_iter().enumerate() {
+      for (x, tile) in row.into_iter().enumerate() {
+        self.layout[y][x] = match tile {
+          LevelObject::Space => Tile::Space,
+          LevelObject::Goal => Tile::Goal,
+          LevelObject::Wall => Tile::Wall,
+        };
+      }
+    }
+
+    for (x, y) in level.boxes() {
+      self.layout[*y][*x] = match self.layout[*y][*x] {
+        Tile::Goal => Tile::BoxOnGoal,
+        _ => Tile::Box,
+      }
+    }
+
+    let (x, y) = level.player();
+    self.layout[*y][*x] = match self.layout[*y][*x] {
+      Tile::Goal => Tile::PlayerOnGoal,
+      _ => Tile::Player,
+    };
+  }
+}
+
+impl<'a, const W: usize, const H: usize, const B: usize> From<&'a Level<W, H, B>>
+  for LevelView<W, H>
+{
+  fn from(level: &'a Level<W, H, B>) -> Self {
+    let layout: [[Tile; W]; H] = [[Tile::Space; W]; H];
+    let mut view = Self { layout };
+    view.update(level);
+    view
   }
 }

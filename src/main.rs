@@ -7,10 +7,11 @@ use core::slice::from_raw_parts as mkslice;
 
 use graphics::LevelView;
 use io::{
-  STDIN_FILENO, eprintln, print, println, read_into_buf,
+  STDIN_FILENO, eprintln, println, read_into_buf,
   terminal::{enable_raw_mode, get_termios, set_termios},
   to_cstr_slice,
 };
+use level::Movement;
 use syscalls::exit;
 
 mod graphics;
@@ -53,23 +54,36 @@ pub fn main(stack_top: *const u8) {
     None => (),
   }
 
-  let view = LevelView::from(&level::LEVEL_0);
-
   let prev_termios = get_termios();
   enable_raw_mode(prev_termios.clone());
+
+  let mut level = level::LEVEL_0.clone();
+  let mut view = LevelView::from(&level);
 
   let mut input_buf: [u8; 1] = [0];
   loop {
     // Clear the terminal
-    print!(b"\x1bc");
+    //print!(b"\x1bc");
     view.print();
 
     read_into_buf(STDIN_FILENO, &mut input_buf);
 
-    match input_buf[0] {
+    let movement = match input_buf[0] {
       b'\x03' => break,
-      _ => (),
+      b'w' => Movement::Up,
+      b'a' => Movement::Left,
+      b's' => Movement::Down,
+      b'd' => Movement::Right,
+      _ => continue,
+    };
+
+    level.move_player(&movement);
+
+    if level.is_solved() {
+      break;
     }
+
+    view.update(&level);
   }
 
   set_termios(&prev_termios);
