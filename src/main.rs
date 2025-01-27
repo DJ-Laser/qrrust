@@ -26,7 +26,7 @@ pub unsafe extern "C" fn _start() {
 
 const LEVELS: &'static [fn() -> (fn(), for<'a> fn(&'a Movement) -> bool)] = const {
   use level::*;
-  &[level_1, level_2]
+  &[level_1, level_2, level_3, level_4]
 };
 
 #[unsafe(no_mangle)]
@@ -52,8 +52,11 @@ pub fn main(stack_top: *const u8) {
 
       level = match selected_level {
         b"1" => 0,
+        b"2" => 1,
+        b"3" => 2,
+        b"4" => 3,
         _ => {
-          eprintln!("No such level, valid levels are 1 to ", flag);
+          eprintln!("No such level, valid levels are 1 to ");
           exit(2);
         }
       }
@@ -84,6 +87,10 @@ pub fn main(stack_top: *const u8) {
       b'a' => Movement::Left,
       b's' => Movement::Down,
       b'd' => Movement::Right,
+      b'r' => {
+        (print_level, move_player) = LEVELS[level]();
+        continue;
+      }
       _ => continue,
     };
 

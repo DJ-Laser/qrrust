@@ -120,3 +120,7 @@ impl<const W: usize, const H: usize, const B: usize> Level<W, H, B> {
 level!(level_1 = ["p b g"]);
 
 level!(level_2 = ["p bg", "gb  "]);
+
+level!(level_3 = ["   g", "P#b ", "   b", "    "]);
+
+level!(level_4 = ["   ####", "p bb gg", "       ", "       "]);
