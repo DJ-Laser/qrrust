@@ -123,4 +123,4 @@ level!(level_2 = ["p bg", "gb  "]);
 
 level!(level_3 = ["   g", "P#b ", "   b", "    "]);
 
-level!(level_4 = ["   ####", "p bb gg", "       ", "       "]);
+level!(level_4 = ["p ####", " bb gg", "      ", "      "]);

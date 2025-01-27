@@ -3,12 +3,10 @@
 #![feature(naked_functions)]
 
 use core::arch::naked_asm;
-use core::slice::from_raw_parts as mkslice;
 
 use io::{
-  STDIN_FILENO, eprintln, print, println, read_into_buf,
+  STDIN_FILENO, print, println, read_into_buf,
   terminal::{enable_raw_mode, get_termios, set_termios},
-  to_cstr_slice,
 };
 use level::Movement;
 use syscalls::exit;
@@ -30,47 +28,11 @@ const LEVELS: &'static [fn() -> (fn(), for<'a> fn(&'a Movement) -> bool)] = cons
 };
 
 #[unsafe(no_mangle)]
-pub fn main(stack_top: *const u8) {
-  let mut args = unsafe {
-    let argc = *(stack_top as *const u64);
-    let argv = stack_top.add(8) as *const *const u8;
-
-    let args = mkslice(argv, argc as usize);
-
-    args.into_iter().map(|arg| to_cstr_slice(*arg))
-  };
-
-  let _argv0 = args.next();
-  let mut level: usize = 0;
-
-  match args.next() {
-    Some(flag @ b"-l") | Some(flag @ b"--level") => {
-      let Some(selected_level) = args.next() else {
-        eprintln!("Expected a level number after ", flag);
-        exit(2);
-      };
-
-      level = match selected_level {
-        b"1" => 0,
-        b"2" => 1,
-        b"3" => 2,
-        b"4" => 3,
-        _ => {
-          eprintln!("No such level, valid levels are 1 to ");
-          exit(2);
-        }
-      }
-    }
-    Some(_) => {
-      eprintln!("Invalid option, only -l or --level is permitted");
-      exit(2);
-    }
-    None => (),
-  }
-
+pub fn main() {
   let prev_termios = get_termios();
   enable_raw_mode(prev_termios.clone());
 
+  let mut level = 0;
   let (mut print_level, mut move_player) = LEVELS[level]();
 
   let mut input_buf: [u8; 1] = [0];

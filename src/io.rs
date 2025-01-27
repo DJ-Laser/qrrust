@@ -1,5 +1,4 @@
 use crate::syscalls::read as read_unsafe;
-use core::slice::from_raw_parts as mkslice;
 
 pub mod terminal;
 mod write;
@@ -15,22 +14,6 @@ pub fn read_into_buf(fd: u32, buf: &mut [u8]) {
   unsafe {
     read_unsafe(fd, buf.as_mut_ptr(), buf.len());
   }
-}
-
-/// Gets the length of a c-string as bytes (unsafe for onvious reasons *ahem* null terminatiors)
-pub unsafe fn strlen(mut s: *const u8) -> usize {
-  unsafe {
-    let mut count = 0;
-    while *s != b'\0' {
-      count += 1;
-      s = s.add(1);
-    }
-    count
-  }
-}
-
-pub unsafe fn to_cstr_slice(s: *const u8) -> &'static [u8] {
-  unsafe { mkslice(s, strlen(s)) }
 }
 
 #[allow(unused_macros)]
