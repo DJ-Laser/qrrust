@@ -4,10 +4,7 @@
 
 use core::arch::naked_asm;
 
-use io::{
-  STDIN_FILENO, print, println, read_into_buf,
-  terminal::{enable_raw_mode, get_termios, set_termios},
-};
+use io::{STDIN_FILENO, print, println, read_into_buf};
 use level::Movement;
 use syscalls::exit;
 
@@ -29,9 +26,6 @@ const LEVELS: &'static [fn() -> (fn(), for<'a> fn(&'a Movement) -> bool)] = cons
 
 #[unsafe(no_mangle)]
 pub fn main() {
-  let prev_termios = get_termios();
-  enable_raw_mode(prev_termios.clone());
-
   let mut level = 0;
   let (mut print_level, mut move_player) = LEVELS[level]();
 
@@ -71,8 +65,6 @@ pub fn main() {
       (print_level, move_player) = LEVELS[level]();
     }
   }
-
-  set_termios(&prev_termios);
 
   exit(0);
 }

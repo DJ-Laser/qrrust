@@ -1,6 +1,5 @@
 use crate::syscalls::read as read_unsafe;
 
-pub mod terminal;
 mod write;
 
 pub(crate) use macros::*;
